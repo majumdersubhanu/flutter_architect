@@ -3,7 +3,7 @@ description: A CLI tool to scaffold Flutter clean architecture boilerplate.
 version: 1.0.0
 
 executables:
-  flutter_architect: bin/flutter_architect.dart
+  flutter_architect: flutter_architect.dart
 
 repository: https://github.com/majumdersubhanu/flutter_architect.git
 
