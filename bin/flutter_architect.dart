@@ -17,6 +17,7 @@ void main(List<String> arguments) async {
 
   final command = arguments[0];
   final name = arguments.length > 1 ? arguments[1] : null;
+  final jsonPath = arguments.length > 2 ? arguments[2] : null;
 
   switch (command) {
     case 'create':
@@ -34,7 +35,7 @@ void main(List<String> arguments) async {
         print("Please provide a model name.");
         exit(1);
       }
-      await AddModelCommand().run(name);
+      await AddModelCommand().run(name, jsonPath);
       break;
     case 'add-service':
       if (name == null) {
