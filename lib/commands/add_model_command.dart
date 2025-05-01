@@ -1,12 +1,22 @@
 // lib/commands/add_model_command.dart
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:recase/recase.dart';
 
 class AddModelCommand {
-  Future<void> run(String name) async {
+  Future<void> run(String name, String? jsonPath) async {
     final snake = ReCase(name).snakeCase;
     final pascal = ReCase(name).pascalCase;
+
+    String fields = 'required String id,';
+    if (jsonPath != null && File(jsonPath).existsSync()) {
+      final jsonString = File(jsonPath).readAsStringSync();
+      final Map<String, dynamic> jsonMap = json.decode(jsonString);
+      fields = jsonMap.entries
+          .map((e) => 'required ${_inferType(e.value)} ${e.key},')
+          .join('\n    ');
+    }
 
     File('lib/domain/models/$snake.dart')
       ..createSync(recursive: true)
@@ -18,16 +28,39 @@ part '$snake.g.dart';
 @freezed
 class $pascal with _\$$pascal {
   const factory $pascal({
-    required String id,
+    $fields
   }) = _$pascal;
 
   factory $pascal.fromJson(Map<String, dynamic> json) => _\$${pascal}FromJson(json);
 }''');
 
-    File('lib/data/model/${snake}_api_model.dart')
+    File('lib/data/repositories/${snake}_repository.dart')
       ..createSync(recursive: true)
-      ..writeAsStringSync('// TODO: Define $pascal API model');
+      ..writeAsStringSync('''
+abstract class I${pascal}Repository {
+  // TODO: Define repository interface
+}
 
-    print('Model "$name" created in domain and data layers.');
+class ${pascal}Repository implements I${pascal}Repository {
+  // TODO: Implement repository methods
+}''');
+
+    File('lib/data/services/${snake}_service.dart')
+      ..createSync(recursive: true)
+      ..writeAsStringSync('''
+class ${pascal}Service {
+  // TODO: Implement $pascal service methods
+}''');
+
+    print(
+      '✅ Model, repository, and service for "$name" created. Run build_runner now.',
+    );
+  }
+
+  String _inferType(dynamic value) {
+    if (value is int) return 'int';
+    if (value is double) return 'double';
+    if (value is bool) return 'bool';
+    return 'String';
   }
 }

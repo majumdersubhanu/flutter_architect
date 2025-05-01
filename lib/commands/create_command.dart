@@ -25,8 +25,30 @@ class CreateCommand {
       File('lib/$file').createSync();
     }
 
-    print('Project structure created successfully.');
+    File('.env').writeAsStringSync('API_URL=https://example.com\nENV=dev');
+
+    final pubspecPath = File('pubspec.yaml');
+    if (pubspecPath.existsSync()) {
+      final pubspec = pubspecPath.readAsStringSync();
+      if (!pubspec.contains('provider')) {
+        print("\n🔧 You must manually add these dependencies to pubspec.yaml:");
+        print("dependencies:");
+        print("  provider:");
+        print("  get_it:");
+        print("  injectable:");
+        print("  auto_route:");
+        print("  flutter_dotenv:");
+        print("  freezed_annotation:");
+        print("dev_dependencies:");
+        print("  build_runner:");
+        print("  freezed:");
+        print("  json_serializable:");
+      }
+    }
+
+    print('\n✅ Base project structure created. Now run:');
+    print(
+      'flutter pub get && dart run build_runner build --delete-conflicting-outputs',
+    );
   }
 }
-
-// TODO Implement this library.
